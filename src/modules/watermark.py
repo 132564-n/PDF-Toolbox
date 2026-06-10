@@ -86,9 +86,9 @@ class WatermarkModule(BaseModule):
         from reportlab.lib.colors import HexColor
 
         text = settings.get("watermark_text", "机密")
-        font_size = int(settings.get("font_size", 48))
+        font_size = int(settings.get("font_size", 72))
         color_hex = settings.get("color", "#ff0000")
-        opacity = float(settings.get("opacity", 30)) / 100.0
+        opacity = float(settings.get("opacity", 50)) / 100.0
         rotation = float(settings.get("rotation", 45))
         position = settings.get("position", "居中")
 
@@ -379,7 +379,7 @@ class WatermarkSettingsPanel(ModuleSettingsPanel):
         size_layout = QHBoxLayout(size_group)
         self.size_spin = QSpinBox()
         self.size_spin.setRange(8, 200)
-        self.size_spin.setValue(48)
+        self.size_spin.setValue(72)
         self.size_spin.setSuffix(" pt")
         size_layout.addWidget(self.size_spin)
         size_layout.addStretch()
@@ -415,14 +415,14 @@ class WatermarkSettingsPanel(ModuleSettingsPanel):
         oh_layout = QHBoxLayout(opacity_header)
         oh_layout.setContentsMargins(0, 0, 0, 0)
         oh_layout.addWidget(QLabel("不透明度:"))
-        self.opacity_value = QLabel("30%")
+        self.opacity_value = QLabel("50%")
         oh_layout.addWidget(self.opacity_value)
         oh_layout.addStretch()
         opacity_layout.addWidget(opacity_header)
 
         self.opacity_slider = QSlider(Qt.Horizontal)
         self.opacity_slider.setRange(5, 100)
-        self.opacity_slider.setValue(30)
+        self.opacity_slider.setValue(50)
         self.opacity_slider.valueChanged.connect(
             lambda v: self.opacity_value.setText(f"{v}%")
         )
