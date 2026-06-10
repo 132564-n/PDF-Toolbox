@@ -334,9 +334,13 @@ class MainWindow(QMainWindow):
         logger.info(f"Switched to module: {self._current_module.name}")
 
         # Update settings panel
-        if self._settings_panel:
-            self._settings_stack.removeWidget(self._settings_panel)
-            self._settings_panel.deleteLater()
+        if self._settings_panel is not None:
+            try:
+                self._settings_stack.removeWidget(self._settings_panel)
+                self._settings_panel.deleteLater()
+            except RuntimeError:
+                pass  # Widget already deleted by Qt
+            self._settings_panel = None
 
         self._settings_panel = self._current_module.create_settings_panel()
         if self._settings_panel:
