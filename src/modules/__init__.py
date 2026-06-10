@@ -14,16 +14,17 @@ from .base import BaseModule, ModuleSettingsPanel
 from .editor import EditorModule
 from .converter import ConverterModule
 from .compressor import CompressorModule
+from .security import SecurityModule
+from .watermark import WatermarkModule
 
 # Register all available modules
 MODULES = {
     "editor": EditorModule,
     "converter": ConverterModule,
     "compressor": CompressorModule,
-    # Will be implemented later:
-    # "security": SecurityModule,
-    # "watermark": WatermarkModule,
-    # "extractor": ExtractorModule,
+    "security": SecurityModule,
+    "watermark": WatermarkModule,
+    # "extractor": ExtractorModule,  # Phase 2 - Week 6
 }
 
 __all__ = [
@@ -33,4 +34,6 @@ __all__ = [
     "EditorModule",
     "ConverterModule",
     "CompressorModule",
+    "SecurityModule",
+    "WatermarkModule",
 ]
