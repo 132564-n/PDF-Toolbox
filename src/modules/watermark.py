@@ -77,13 +77,16 @@ class WatermarkModule(BaseModule):
             "stats": stats,
         }
 
+    # CJK font cache (load once)
+    _cjk_font_registered = False
+
     def _create_text_watermark_pdf(
         self, page_width: float, page_height: float, settings: dict
     ) -> str:
         """Create a temporary PDF with the text watermark."""
         from reportlab.pdfgen import canvas
-        from reportlab.lib.units import mm
-        from reportlab.lib.colors import HexColor
+        from reportlab.pdfbase import pdfmetrics
+        from reportlab.pdfbase.cidfonts import UnicodeCIDFont
 
         text = settings.get("watermark_text", "机密")
         font_size = int(settings.get("font_size", 72))
@@ -91,6 +94,17 @@ class WatermarkModule(BaseModule):
         opacity = float(settings.get("opacity", 50)) / 100.0
         rotation = float(settings.get("rotation", 45))
         position = settings.get("position", "居中")
+
+        # Register CJK font once (supports Chinese/Japanese/Korean)
+        if not WatermarkModule._cjk_font_registered:
+            try:
+                pdfmetrics.registerFont(
+                    UnicodeCIDFont('STSong-Light')
+                )
+                WatermarkModule._cjk_font_registered = True
+                logger.info("CJK font (STSong-Light) registered for watermark")
+            except Exception:
+                logger.warning("CJK font not available, watermark text may not render")
 
         # Get position coordinates
         pos_x_frac, pos_y_frac = self.POSITIONS.get(
@@ -114,8 +128,11 @@ class WatermarkModule(BaseModule):
             except (ValueError, IndexError):
                 c.setFillColorRGB(1, 0, 0)  # Default red
 
-            # Set font
-            c.setFont("Helvetica", font_size)
+            # Use CJK font for Chinese text
+            if WatermarkModule._cjk_font_registered:
+                c.setFont("STSong-Light", font_size)
+            else:
+                c.setFont("Helvetica", font_size)
 
             # Calculate position
             x = page_width * pos_x_frac
