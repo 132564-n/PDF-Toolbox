@@ -395,10 +395,9 @@ class WatermarkSettingsPanel(ModuleSettingsPanel):
         self.color_btn = QPushButton()
         self.color_btn.setFixedSize(36, 36)
         self.color_btn.setToolTip("点击更换颜色")
-        self._update_color_btn()
         self.color_btn.clicked.connect(self._pick_color)
         cr_layout.addWidget(self.color_btn)
-        self.color_text_label = QLabel("红色 (#FF0000)")
+        self.color_text_label = QLabel()
         self.color_text_label.setStyleSheet(
             "font-size: 12px; color: #cdd6f4; padding-left: 4px;"
         )
@@ -406,6 +405,8 @@ class WatermarkSettingsPanel(ModuleSettingsPanel):
         cr_layout.addStretch()
         color_layout.addWidget(color_row)
         text_layout.addWidget(color_group)
+        # Must call AFTER color_text_label is created
+        self._update_color_btn()
 
         # Opacity
         opacity_group = QGroupBox("透明度")
