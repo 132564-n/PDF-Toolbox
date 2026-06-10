@@ -58,6 +58,18 @@ def main():
     app.setApplicationVersion(__version__)
     app.setOrganizationName("PDFToolbox")
 
+    # Load Qt Chinese translations for native dialogs
+    from PySide6.QtCore import QTranslator, QLibraryInfo
+    translator = QTranslator()
+    qt_translations_path = QLibraryInfo.path(
+        QLibraryInfo.TranslationsPath
+    )
+    if translator.load("qt_zh_CN", qt_translations_path):
+        app.installTranslator(translator)
+        logger.info("Chinese translation loaded")
+    else:
+        logger.debug("Qt Chinese translation not found, using defaults")
+
     # Apply dark theme
     load_stylesheet(app)
 

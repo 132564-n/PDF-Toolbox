@@ -213,7 +213,8 @@ class WatermarkModule(BaseModule):
 
                 writer = PdfWriter()
                 for page in reader.pages:
-                    page.merge_page(wm_page, over=False)
+                    # over=True: watermark on TOP (visible)
+                    page.merge_page(wm_page, over=True)
                     writer.add_page(page)
 
                 base_name = Path(file_path).stem
@@ -278,7 +279,8 @@ class WatermarkModule(BaseModule):
 
                 writer = PdfWriter()
                 for page in reader.pages:
-                    page.merge_page(wm_page, over=False)
+                    # over=True: watermark on TOP (visible)
+                    page.merge_page(wm_page, over=True)
                     writer.add_page(page)
 
                 base_name = Path(file_path).stem
@@ -385,15 +387,24 @@ class WatermarkSettingsPanel(ModuleSettingsPanel):
 
         # Color button
         color_group = QGroupBox("水印颜色")
-        color_layout = QHBoxLayout(color_group)
+        color_layout = QVBoxLayout(color_group)
+        color_row = QWidget()
+        cr_layout = QHBoxLayout(color_row)
+        cr_layout.setContentsMargins(0, 0, 0, 0)
         self._current_color = QColor(255, 0, 0)
         self.color_btn = QPushButton()
-        self.color_btn.setFixedSize(32, 32)
+        self.color_btn.setFixedSize(36, 36)
+        self.color_btn.setToolTip("点击更换颜色")
         self._update_color_btn()
         self.color_btn.clicked.connect(self._pick_color)
-        color_layout.addWidget(self.color_btn)
-        color_layout.addWidget(QLabel("点击选择颜色"))
-        color_layout.addStretch()
+        cr_layout.addWidget(self.color_btn)
+        self.color_text_label = QLabel("红色 (#FF0000)")
+        self.color_text_label.setStyleSheet(
+            "font-size: 12px; color: #cdd6f4; padding-left: 4px;"
+        )
+        cr_layout.addWidget(self.color_text_label)
+        cr_layout.addStretch()
+        color_layout.addWidget(color_row)
         text_layout.addWidget(color_group)
 
         # Opacity
@@ -526,12 +537,45 @@ class WatermarkSettingsPanel(ModuleSettingsPanel):
             self._update_color_btn()
 
     def _update_color_btn(self):
-        """Update the color button appearance."""
+        """Update the color button appearance and label."""
         c = self._current_color
         self.color_btn.setStyleSheet(
             f"background-color: {c.name()}; "
             f"border: 1px solid #555; border-radius: 4px;"
         )
+        # Update color name label in Chinese
+        color_name = self._color_to_chinese(c)
+        self.color_text_label.setText(
+            f"{color_name} ({c.name().upper()})"
+        )
+
+    @staticmethod
+    def _color_to_chinese(c: QColor) -> str:
+        """Map common colors to Chinese names."""
+        r, g, b = c.red(), c.green(), c.blue()
+        if r > 200 and g < 100 and b < 100:
+            return "红色"
+        elif r > 200 and g > 150 and b < 50:
+            return "橙色"
+        elif r > 200 and g > 200 and b < 50:
+            return "黄色"
+        elif r < 100 and g > 200 and b < 100:
+            return "绿色"
+        elif r < 100 and g > 150 and b > 200:
+            return "蓝色"
+        elif r > 150 and g < 100 and b > 200:
+            return "紫色"
+        elif r < 80 and g < 80 and b < 80:
+            return "黑色"
+        elif r > 200 and g > 200 and b > 200:
+            return "白色"
+        elif r > 150 and g > 150 and b > 150:
+            return "灰色"
+        elif r > 180 and g > 100 and b < 100:
+            return "粉红色"
+        elif r < 100 and g > 180 and b > 180:
+            return "青色"
+        return "自定义颜色"
 
     def _browse_image(self):
         """Open file dialog to select watermark image."""
