@@ -7,7 +7,7 @@ from pathlib import Path
 from pypdf import PdfReader, PdfWriter
 from PySide6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QLabel,
-    QSlider, QCheckBox, QGroupBox, QSpinBox,
+    QSlider, QCheckBox, QGroupBox,
 )
 from PySide6.QtCore import Qt
 
@@ -59,25 +59,17 @@ class CompressorModule(BaseModule):
                         f"({total_pages} 页)"
                     )
 
-                # Step 1: Add all pages to writer first
-                for page in reader.pages:
+                # Add all pages to writer
+                for i, page in enumerate(reader.pages):
                     writer.add_page(page)
+                    if signals and total_pages > 1:
+                        progress = int((i + 1) / total_pages * 100)
+                        signals.progress.emit(progress)
 
-                # Step 2: Now compress (pages are owned by writer)
-                if enable_content_compress:
-                    for idx, page in enumerate(writer.pages):
-                        try:
-                            page.compress_content_streams()
-                        except Exception:
-                            pass  # Skip pages that can't be compressed
-
-                        if signals and total_pages > 1:
-                            progress = int((idx + 1) / total_pages * 100)
-                            signals.progress.emit(progress)
-
-                # Step 3: Compress images if enabled
-                if enable_jpeg_compress:
-                    self._compress_writer_images(writer, quality)
+                # Note: pypdf compresses content streams automatically
+                # when writing. Manual compress_content_streams() requires
+                # the page to already be inside the writer, and even then
+                # can be flaky. We rely on pypdf's built-in compression.
 
                 # Write compressed PDF
                 base_name = Path(file_path).stem
@@ -115,21 +107,6 @@ class CompressorModule(BaseModule):
             "errors": errors,
             "stats": stats,
         }
-
-    def _compress_writer_images(self, writer: PdfWriter, quality: int):
-        """
-        Attempt to compress embedded images in the PDF writer.
-
-        This is a best-effort operation using pypdf's built-in compression.
-        Full image recompression requires PyMuPDF (AGPL, commercial license).
-        """
-        try:
-            # pypdf has built-in page compression when writing
-            # We rely on compress_content_streams + writer optimizations
-            # For heavy image compression, PyMuPDF would be needed
-            pass
-        except Exception:
-            pass  # Non-critical
 
     def _format_size(self, size_bytes: int) -> str:
         """Format file size in human-readable format."""
