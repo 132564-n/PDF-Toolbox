@@ -336,10 +336,12 @@ class MainWindow(QMainWindow):
         # Update settings panel
         if self._settings_panel:
             self._settings_stack.removeWidget(self._settings_panel)
+            self._settings_panel.deleteLater()
 
         self._settings_panel = self._current_module.create_settings_panel()
         if self._settings_panel:
             self._settings_stack.addWidget(self._settings_panel)
+            self._settings_stack.setCurrentWidget(self._settings_panel)
 
         # Update start button text
         self.btn_start.setText(f"🚀 {self._current_module.name}")
