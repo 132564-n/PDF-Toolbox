@@ -1,0 +1,43 @@
+# Python
+__pycache__/
+*.py[cod]
+*.so
+*.egg-info/
+dist/
+build/
+*.egg
+*.pyd
+*.spec
+
+# Virtual environments
+venv/
+env/
+.venv/
+.env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Project specific
+output/
+*.log
+logs/
+*.dat
+
+# Secrets — NEVER commit these!
+private_key.pem
+*.pem
+!public_key.pem
+
+# PyInstaller
+*.manifest
+*.exe
