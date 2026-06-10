@@ -41,3 +41,4 @@ private_key.pem
 # PyInstaller
 *.manifest
 *.exe
+test_files/*.pdf
